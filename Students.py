@@ -12,6 +12,8 @@ class Student():
 
     def add_student_group(self, args):
         self.groups = [arg for arg in args]
+        for group in self.groups:
+            group.addstudent(self)
 
     def prediction(self):
         """Creates a dictionary of prediction for Student object.

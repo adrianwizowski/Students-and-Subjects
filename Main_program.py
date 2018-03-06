@@ -1,6 +1,8 @@
 import pandas as pd
 import math
 import copy
+import tkinter as tk
+from tkinter.filedialog import askopenfilename
 from Students import Student, in_range
 from Subjects_Groups import *
 
@@ -20,18 +22,35 @@ class Main():
        ...
 
        """
+        tk_window = tk.Tk()
+        tk_window.withdraw()
+        chosen_file = askopenfilename(filetypes =(('Excel Files', '.xls'), ('Excel Files','*.xlsx')))
+        if chosen_file == "":
+            print("File 1 Not Found")
+        else:
+            d = pd.read_excel(chosen_file, index_col=[0]).to_dict(orient='index')
+            self.tmp = copy.deepcopy(d)
 
-        d = pd.read_excel(r"students.xlsx", index_col=[0]).to_dict(orient='index')
+            for student in d:
+                for subject, group in d[student].items():
+                    if math.isnan(group):
+                        del self.tmp[student][subject]
 
-        self.tmp = copy.deepcopy(d)
-
-        for student in d:
-            for subject, group in d[student].items():
-                if math.isnan(group):
-                    del self.tmp[student][subject]
-
-        self.students = {k: v for k, v in self.tmp.items() if v}
+            self.students = {k: v for k, v in self.tmp.items() if v}
+            print(len(self.students))
         """self.students = {'Student Name':{'Subject':group number, 'Subject': group number}, ... }"""
+
+    def dateframe_validator(self):
+        chosen_file = askopenfilename(filetypes=(('Excel Files', '.xls'), ('Excel Files', '*.xlsx')))
+        if chosen_file == "":
+            print("File 1 Not Found")
+        else:
+            self.dataframe = pd.read_excel(chosen_file, index_col=[0])
+        for row in self.dataframe.iterrows():
+            if row[0].replace(' ','').isalpha():
+                pass
+            else:
+                print('Wrong name at ' + str(self.dataframe.index.get_loc(row[0])+2) + ' row')
 
     def create_students(self):
         """Creates Student object for evert student from parsed Excel file and store object in students_list"""
@@ -41,7 +60,7 @@ class Main():
                 for static_subject in Necessary_lists.static_subjects:
                     if subject == static_subject.disc:
                         for group in static_subject.groups:
-                            if group == str(subject) + ' ' + str(int(value)):
+                            if group.discrip == str(subject) + ' ' + str(int(value)):
                                 args.append(group)
 
             tmp_student = Student(student)
@@ -120,3 +139,17 @@ class Main():
                 print(group.discrip,'|','Group capacity: '+ str(group.capacity),'|','Students in group: '+ str(len(group.students)))
                 for student in group.students:
                     print(student.name)
+
+    def check_students_groups(self):
+        """Checks if all students are signed for all subjects they have to choose."""
+        for student in Necessary_lists.students_list:
+            if len(student.picked_groups) < len(Necessary_lists.choose_subjects):
+                print(student.name)
+
+    def number_of_students_signed_for_subjects(self):
+        """Counts students signed for all subjects"""
+        for subject in Necessary_lists.static_subjects + Necessary_lists.choose_subjects:
+            lenght = 0
+            for group in subject.groups:
+                lenght += len(group.students)
+            print(subject.disc + ' ' + str(lenght))

@@ -8,8 +8,8 @@ class Necessary_lists():
     choose_subjects = []
 
 class Subject():
-    def __init__(self, disc):
-        self.disc = disc
+    def __init__(self, desc):
+        self.desc = desc
         self.groups = []
 
     def addgroup(self, group):
@@ -20,9 +20,9 @@ class Subject():
             print('Group already in Groups')
 
 class Group():
-    def __init__(self, discrip, number, group_capacity, date_start, date_end):
+    def __init__(self, descrip, number, group_capacity, date_start, date_end):
         """Date format: (year, month, day, hour, min)"""
-        self.discrip = discrip
+        self.descrip = descrip
         self.capacity = group_capacity
         self.number = number
         self.date_start = datetime.date(year=date_start[0], month=date_start[1], day=date_start[2])
